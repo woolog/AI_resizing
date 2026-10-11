@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelScale - 고성능 일괄 이미지 리사이저</title>
+  <meta name="description" content="서버 전송 없이 브라우저 메모리에서 100% 안전하고 빠르게 작동하는 고품질 일괄 이미지 리사이징 도구입니다. X축, Y축, 긴축, 짧은축, 퍼센트 비율 기준 조절 및 개별/ZIP 다운로드를 지원합니다.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 배경 애니메이션 그라디언트 블러 오라 -->
+  <div class="bg-blur-orb orb-1"></div>
+  <div class="bg-blur-orb orb-2"></div>
+  <div class="bg-blur-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- 헤더 -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <path d="M21 15l-5-5L5 21"></path>
+            <path d="M14 14l3 3 4-4"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>PixelScale <span class="badge-pro">PRO</span></h1>
+          <p class="brand-sub">클라이언트 사이드 고성능 일괄 이미지 리사이저</p>
+        </div>
+      </div>
+
+      <!-- 프라이버시 & 보안 안심 뱃지 -->
+      <div class="privacy-badge" title="이미지가 외부 서버로 전송되지 않고 사용자의 로컬 브라우저 메모리(Canvas)에서만 즉각 처리됩니다.">
+        <span class="pulse-dot"></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>100% 로컬 보안 처리 (서버 전송 없음)</span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- 1. 리사이징 설정 컨트롤 패널 -->
+      <section class="card settings-panel">
+        <div class="card-header">
+          <div class="header-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2>리사이징 기준 설정</h2>
+            <p class="card-desc">이미지 종횡비를 유지하며 변환할 기준과 크기를 선택하세요.</p>
+          </div>
+        </div>
+
+        <!-- 5가지 모드 선택 탭 -->
+        <div class="resize-modes-grid" id="modeSelector">
+          <button type="button" class="mode-btn active" data-mode="width">
+            <div class="mode-btn-indicator"></div>
+            <div class="mode-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12H3m0 0l4-4m-4 4l4 4m14-4l-4-4m4 4l-4 4"></path>
+              </svg>
+            </div>
+            <div class="mode-info">
+              <span class="mode-num">1</span>
+              <span class="mode-title">X축 (가로 너비)</span>
+              <span class="mode-hint">너비 기준 비율 맞춤</span>
+            </div>
+          </button>
+
+          <button type="button" class="mode-btn" data-mode="height">
+            <div class="mode-btn-indicator"></div>
+            <div class="mode-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v18m0-18l-4 4m4-4l4 4m-4 14l-4-4m4 4l4-4"></path>
+              </svg>
+            </div>
+            <div class="mode-info">
+              <span class="mode-num">2</span>
+              <span class="mode-title">Y축 (세로 높이)</span>
+              <span class="mode-hint">높이 기준 비율 맞춤</span>
+            </div>
+          </button>
+
+          <button type="button" class="mode-btn" data-mode="longest">
+            <div class="mode-btn-indicator"></div>
+            <div class="mode-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                <path d="M18 6L6 18"></path>
+              </svg>
+            </div>
+            <div class="mode-info">
+              <span class="mode-num">3</span>
+              <span class="mode-title">긴 축 (최대변)</span>
+              <span class="mode-hint">더 긴 변을 지정값으로</span>
+            </div>
+          </button>
+
+          <button type="button" class="mode-btn" data-mode="shortest">
+            <div class="mode-btn-indicator"></div>
+            <div class="mode-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                <path d="M9 9h6v6H9z"></path>
+              </svg>
+            </div>
+            <div class="mode-info">
+              <span class="mode-num">4</span>
+              <span class="mode-title">짧은 축 (최소변)</span>
+              <span class="mode-hint">더 짧은 변을 지정값으로</span>
+            </div>
+          </button>
+
+          <button type="button" class="mode-btn" data-mode="percent">
+            <div class="mode-btn-indicator"></div>
+            <div class="mode-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="5" x2="5" y2="19"></line>
+                <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                <circle cx="17.5" cy="17.5" r="2.5"></circle>
+              </svg>
+            </div>
+            <div class="mode-info">
+              <span class="mode-num">5</span>
+              <span class="mode-title">퍼센트 비율 (%)</span>
+              <span class="mode-hint">배율 스케일링</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- 설정 상세 입력란 및 프리셋 -->
+        <div class="settings-body">
+          <div class="input-preset-row">
+            <!-- 수치 입력부 -->
+            <div class="input-control-group">
+              <label id="targetValueLabel" for="targetValueInput">
+                <span class="label-text">목표 가로 너비 (px)</span>
+                <span class="label-badge" id="modeExplanation">가로 크기에 맞춰 세로는 비율 유지</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="number" id="targetValueInput" value="1200" min="1" max="10000" step="1" placeholder="예: 1200">
+                <span class="input-unit" id="targetValueUnit">px</span>
+              </div>
+            </div>
+
+            <!-- 프리셋 칩 버튼들 -->
+            <div class="presets-group">
+              <label class="preset-label">빠른 프리셋 선택</label>
+              <div class="preset-chips" id="presetChips">
+                <!-- JS에서 모드에 맞게 동적 업데이트 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 고급 옵션 접기/펼치기 아코디언 -->
+          <div class="advanced-options-toggle" id="toggleAdvanced">
+            <div class="toggle-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              <span>고급 옵션 (포맷, 화질, 업스케일 방지)</span>
+            </div>
+            <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+
+          <div class="advanced-options-content hidden" id="advancedContent">
+            <div class="options-grid">
+              <!-- 출력 포맷 -->
+              <div class="option-field">
+                <label for="formatSelect">출력 포맷</label>
+                <select id="formatSelect" class="custom-select">
+                  <option value="original">원본 포맷 유지 (권장)</option>
+                  <option value="image/webp">WebP (고효율/용량 절감)</option>
+                  <option value="image/jpeg">JPEG (호환성 최적화)</option>
+                  <option value="image/png">PNG (무손실 투명도)</option>
+                </select>
+              </div>
+
+              <!-- 이미지 압축 품질 (JPEG/WebP용) -->
+              <div class="option-field" id="qualityField">
+                <div class="field-header">
+                  <label for="qualityRange">화질 / 압축률</label>
+                  <span class="field-val" id="qualityValue">92%</span>
+                </div>
+                <input type="range" id="qualityRange" min="50" max="100" value="92" class="custom-range">
+              </div>
+
+              <!-- 업스케일 방지 토글 -->
+              <div class="option-field checkbox-field">
+                <label class="switch-container">
+                  <input type="checkbox" id="noUpscaleCheck">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label">원본보다 큰 경우 확대(업스케일) 방지</span>
+                </label>
+                <span class="field-hint">이미지가 설정값보다 작으면 원본 크기를 보존합니다.</span>
+              </div>
+
+              <!-- 파일명 접미사/접두사 -->
+              <div class="option-field">
+                <label for="filePrefixInput">파일명 접두사</label>
+                <input type="text" id="filePrefixInput" class="custom-input" placeholder="비워두거나 입력 (예: resized_)" value="resized_">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. 업로드 드롭존 -->
+      <section class="card dropzone-card" id="dropZone">
+        <input type="file" id="fileInput" multiple accept="image/*" class="visually-hidden">
+        <div class="dropzone-inner">
+          <div class="dropzone-icon-circle">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div class="dropzone-text">
+            <h3>이미지 파일을 이곳에 드래그하여 놓으세요</h3>
+            <p>또는 아래 버튼을 눌러 컴퓨터에서 파일을 선택하세요 (클립보드 이미지 <code>Ctrl+V</code> 지원)</p>
+          </div>
+          <div class="dropzone-actions">
+            <button type="button" class="btn btn-primary" id="selectFilesBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span>파일 선택하기</span>
+            </button>
+            <span class="format-badge">JPG, PNG, WebP, GIF, BMP, SVG 등 대용량 다중 지원</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 대시보드 상태 바 & 일괄 실행 바 (이미지 추가 시 표시) -->
+      <section class="action-dashboard card hidden" id="actionDashboard">
+        <div class="dashboard-left">
+          <div class="stat-pill">
+            <span class="stat-label">총 이미지</span>
+            <span class="stat-num" id="totalCount">0</span>
+          </div>
+          <div class="stat-pill success">
+            <span class="stat-label">리사이징 완료</span>
+            <span class="stat-num" id="completedCount">0</span>
+          </div>
+          <div class="stat-pill info">
+            <span class="stat-label">총 용량</span>
+            <span class="stat-num" id="totalSize">0 MB</span>
+          </div>
+        </div>
+
+        <div class="dashboard-right">
+          <button type="button" class="btn btn-ghost" id="clearAllBtn" title="모든 이미지 삭제">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>전체 비우기</span>
+          </button>
+
+          <button type="button" class="btn btn-outline" id="processAllBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span id="processBtnText">일괄 리사이징 시작</span>
+          </button>
+
+          <button type="button" class="btn btn-gradient" id="downloadZipBtn" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>일괄 다운로드 (.ZIP)</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 진행률 바 (처리 중일 때 표시) -->
+      <div class="progress-container hidden" id="progressContainer">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+        </div>
+        <div class="progress-info">
+          <span id="progressStatusText">리사이징 처리 중... (0/0)</span>
+          <span id="progressPercentage">0%</span>
+        </div>
+      </div>
+
+      <!-- 4. 이미지 목록 갤러리 -->
+      <section class="gallery-section hidden" id="gallerySection">
+        <div class="gallery-header">
+          <div class="gallery-title-wrap">
+            <h3>이미지 대기열</h3>
+            <span class="gallery-subtitle" id="gallerySubtitle">설정값에 맞춰 실시간으로 크기가 자동 계산됩니다.</span>
+          </div>
+          <div class="view-mode-toggle">
+            <button type="button" class="view-btn active" id="viewCardsBtn" title="카드 뷰">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </button>
+            <button type="button" class="view-btn" id="viewListBtn" title="리스트 뷰">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 이미지 카드 그리드 / 리스트 -->
+        <div class="image-grid" id="imageGrid">
+          <!-- JS에서 동적으로 렌더링 -->
+        </div>
+      </section>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>PixelScale &copy; 2026. Client-Side High-Speed Image Resizing Engine.</p>
+        <p class="footer-sub">모든 연산은 HTML5 Canvas와 웹 브라우저 메모리 내에서 100% 로컬로 수행됩니다.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 이미지 비교/미리보기 모달 -->
+  <div class="modal-backdrop hidden" id="previewModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 id="modalFilename">이미지 미리보기</h3>
+          <span class="modal-badge" id="modalDimensionInfo">원본: 0 x 0 &rarr; 리사이즈: 0 x 0</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-comparison">
+          <div class="preview-side">
+            <span class="side-badge">변환 결과</span>
+            <div class="img-preview-box">
+              <img id="modalResizedImg" alt="리사이징된 이미지">
+            </div>
+            <div class="preview-meta" id="modalResizedMeta">-</div>
+          </div>
+          <div class="preview-side">
+            <span class="side-badge">원본 이미지</span>
+            <div class="img-preview-box">
+              <img id="modalOriginalImg" alt="원본 이미지">
+            </div>
+            <div class="preview-meta" id="modalOriginalMeta">-</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="modalCloseActionBtn">닫기</button>
+        <button type="button" class="btn btn-primary" id="modalDownloadBtn">이 이미지 다운로드</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 로컬 오프라인 지원 JSZip 라이브러리 로드 -->
+  <script src="jszip.min.js"></script>
+  <!-- 메인 애플리케이션 스크립트 -->
+  <script src="app.js"></script>
+</body>
+</html>
